@@ -30,7 +30,7 @@ Log-in validation or financial related validation is better to construct in back
 
   `flex-wrap` , `justify-contnet` and `align-items`and 
 
-  `align-items`  \(with wrapped item and multiple lines\). 
+  `align-content`  \(with wrapped item and multiple lines\). 
 
   `flex-grow`to fill the rest of extra space.`flex-shrink` to shrink target element for other brother elements. `order`d to make target element to be head, origin and tail.
 

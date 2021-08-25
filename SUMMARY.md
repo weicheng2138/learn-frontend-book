@@ -2,4 +2,5 @@
 
 * [Catalog](README.md)
 * [HTML/CSS](html-css.md)
+* [Javascript](javascript.md)
 
