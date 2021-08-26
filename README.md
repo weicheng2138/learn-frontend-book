@@ -13,7 +13,7 @@ description: >-
  Tends to cover SEO approach.
 {% endhint %}
 
-## [Javascript](javascript.md)
+## Javascript
 
 ## Git
 
