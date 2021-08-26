@@ -284,5 +284,183 @@ className={`chevron chevron-up ${count >= 10 && 'visibility-hidden'}`}
 `onClick={handleClick} // without parameter`
 {% endhint %}
 
+* Advanced approach makes you to make error example to work.
 
+```bash
+// Original
+const handleClick = (type) => {
+  return function() {
+    if (type === 'increment') {
+      setCount(count + 1);
+    }
+    if (type === 'decrement') {
+      setCount(count - 1);
+    }
+  };
+};
+
+// Simplified
+const handleClick = type => () =>
+    setCount(type === 'increment' ? count + 1 : count - 1);
+```
+
+{% hint style="success" %}
+`onClick={handleClick('increment')}`
+{% endhint %}
+
+### Map for Looping Components
+
+```bash
+// [undefined, undefined, ..., undefined]
+Array.from({ length: 10 });
+
+// [0, 1, 2, ..., 8, 9]
+Array.from({ length: 10 }, (_, index) => index)
+```
+
+```bash
+const counters = Array.from({ length: 14 }, (_, index) => index);
+
+// In JSX
+{
+    counters.map((item) => (<Counter />))
+}
+```
+
+### Speed Converter
+
+{% hint style="info" %}
+[https://codepen.io/weicheng2138/pen/xxrGxGR?editors=0011](https://codepen.io/weicheng2138/pen/xxrGxGR?editors=0011)
+{% endhint %}
+
+```bash
+// in React Component
+const handleInputChange = (e) => {
+  const {value} = e.target;
+  setInputValue(value);
+};
+
+// in JSX
+<input type="number" className="input-number" min="0"                
+onChange={handleInputChange} value={inputValue}/>
+```
+
+### Props for CardFooter
+
+```bash
+const CardFooter = (props) => {
+  const { inputValue } = props;
+
+  // ...
+  return (
+    {/* ... */ }
+  );
+};
+
+// in SpeedConverter
+<CardFooter inputValue={inputValue} />
+```
+
+{% hint style="danger" %}
+**Never** use Hook method \(useState useEffect...\) in condition, loop and nested functions. But you can use the data and function from useState. Normally, the render process call those React Components, React Hooks record the calling order of those hooks. If you put it in condition, the order will be in echos.
+{% endhint %}
+
+## CSS-in-JS \(styled-components/_**emotion**_\)
+
+{% hint style="info" %}
+[https://codesandbox.io/s/jovial-firefly-twwr8?file=/src/WeatherApp.js](https://codesandbox.io/s/jovial-firefly-twwr8?file=/src/WeatherApp.js)
+{% endhint %}
+
+```bash
+import React from "react";
+import styled from '@emotion/styled';
+
+const Container = styled.div`
+  background-color: #ededed;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;
+
+const WeatherCard = styled.div`
+  position: relative;
+  min-width: 360px;
+  box-shadow: 0 1px 3px 0 #999999;
+  background-color: #f9f9f9;
+  box-sizing: border-box;
+  padding: 30px 15px;
+`;
+
+const WeatherApp = () => {
+  return(
+    <Container>
+      <WeatherCard>
+        <h1>Weather</h1>
+      </WeatherCard>
+    </Container>
+  );
+};
+
+export default WeatherApp;
+```
+
+* class name of each component will come with a unique name. `css-ncsjdcn`
+
+```bash
+// great for manipulate svg animation and directly use Cloudy in JSX
+import { ReactComponent as Cloudy } from './images/cloudy.svg';
+
+// great for normal image with static using
+import cloudyIcon from './images/cloudy.svg';
+// in JSX
+<img src={cloudyIcon} alt="cloudy icon" />
+```
+
+```bash
+// You can make component by style-component
+// You can also create Comp then add style
+const Cloudy = styled(CloudyIcon)`
+  flex-basis: 30%;
+`;
+```
+
+```bash
+// bring props in styled-components
+// in JSX
+<Location theme="dark">台北市</Location>
+
+// in styled-components
+const Location = styled.div`
+  ${props => console.log(props)}
+  font-size: 28px;
+  color: ${props => props.theme === 'dark' ? '#dadada' : '#212121'};
+  margin-bottom: 20px;
+`;
+```
+
+```bash
+// pre-define some template style-component and reuse it
+// props also can be used
+import { css } from '@emotion/core';
+
+const buttonDefault = (props) => css`
+  display: block;
+  width: 120px;
+  height: 30px;
+  font-size: 14px;
+  background-color: transparent;
+  color: ${props.theme === 'dark' ? '#dadada' : '#212121'};
+`;
+
+const rejectButton = styled.button`
+  ${buttonDefault}
+  background-color: red;
+`
+
+const acceptButton = styled.button`
+  ${buttonDefault}
+  background-color: green;
+`
+```
 
