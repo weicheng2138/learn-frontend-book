@@ -483,3 +483,59 @@ const acceptButton = styled.button`
 `console.log(currentWeather); // reserve all attr of an object`
 {% endhint %}
 
+### useEffect \(**side-effect**\)
+
+| invoke function component -&gt; | render -&gt; | execute function in useEffect |
+| :--- | :--- | :--- |
+| beginning of the component | JSX | `useEffect()` |
+
+* Will be called either `setSomething()` is called or the first load. Or you can say that it will be called after **rendering**.
+* Mutations, subscriptions, timers, logging, and other **side effects** are not allowed inside the main body of a function component
+
+```bash
+ // [dependencies] is put to avoid infinite loop of calling
+ // setSomething and setEffect. Only call setEffect when
+ // dependencies is mutated. [] -> only one time
+ useEffect(() => {
+    console.log('execute function in useEffect');
+    fetchCurrentWeather();
+ }, [dependencies]);
+```
+
+{% hint style="danger" %}
+After rendering, useEffect will be called as long as dependencies are mutated
+{% endhint %}
+
+```bash
+// setSomething can preserve the preState
+useEffect(() => {
+    console.log('execute function in useEffect');
+    fetchCurrentWeather();
+    fetchWeatherForecast();
+}, []);
+
+const fetchCurrentWeather = () =>
+    
+    setWeatherElement((preState) => ({
+        ...preState,
+        observationTime: locationData.time.obsTime,
+        ...
+    }));
+}
+
+const fetchWeatherForecast= () =>
+    
+    setWeatherElement((preState) => ({
+        ...preState,
+        description: weatherElements.Wx.parameterName,
+        ...
+    }));
+}
+
+// in JSX
+<Redo onClick={() => {
+    fetchCurrentWeather();
+    fetchWeatherForecast();
+}} />
+```
+
