@@ -365,7 +365,7 @@ const CardFooter = (props) => {
 **Never** use Hook method \(useState useEffect...\) in condition, loop and nested functions. But you can use the data and function from useState. Normally, the render process call those React Components, React Hooks record the calling order of those hooks. If you put it in condition, the order will be in echos.
 {% endhint %}
 
-## CSS-in-JS \(styled-components/_**emotion**_\)
+### CSS-in-JS \(styled-components/_**emotion**_\)
 
 {% hint style="info" %}
 [https://codesandbox.io/s/jovial-firefly-twwr8?file=/src/WeatherApp.js](https://codesandbox.io/s/jovial-firefly-twwr8?file=/src/WeatherApp.js)
@@ -495,7 +495,7 @@ const acceptButton = styled.button`
 ```bash
  // [dependencies] is put to avoid infinite loop of calling
  // setSomething and setEffect. Only call setEffect when
- // dependencies is mutated. [] -> only one time
+ // dependencies is mutated. [] -> only the first time
  useEffect(() => {
     console.log('execute function in useEffect');
     fetchCurrentWeather();
@@ -538,4 +538,36 @@ const fetchWeatherForecast= () =>
     fetchWeatherForecast();
 }} />
 ```
+
+```bash
+// make fetchData to be public use in useEffect and JSX
+const fetchData = async () => {
+  const [currentWeather, weatherForecast] = await Promise.all([
+    fetchCurrentWeather(),
+    fetchWeatherForecast(),
+  ]);
+  
+  setWeatherElement({
+    ...currentWeather,
+    ...weatherForecast,
+  });
+};
+
+// in useEffect
+useEffect(() => {
+  console.log('execute function in useEffect');
+  fetchData();
+}, []);
+
+// in JSX
+<Redo onClick={fetchData} />
+```
+
+{% hint style="warning" %}
+After do things above... Eslint output error...
+
+_React Hook useEffect has a missing dependency: 'fetchData'. Either include it or remove the dependency array. \(react-hooks/exhaustive-deps\)_
+{% endhint %}
+
+* Before that eslint problem, fetchData is defined and only used in useEffect. However, we take it out and make it public, problem pops out.
 
