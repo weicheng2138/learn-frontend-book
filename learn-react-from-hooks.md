@@ -439,6 +439,10 @@ const Location = styled.div`
 `;
 ```
 
+{% hint style="warning" %}
+You can not comment `${props => console.log(props)}` in Location component. It works for css element.
+{% endhint %}
+
 ```bash
 // pre-define some template style-component and reuse it
 // props also can be used
@@ -463,4 +467,19 @@ const acceptButton = styled.button`
   background-color: green;
 `
 ```
+
+* Get the weather data from [https://opendata.cwb.gov.tw/user/authkey](https://opendata.cwb.gov.tw/user/authkey) and api url from [https://opendata.cwb.gov.tw/dist/opendata-swagger.html](https://opendata.cwb.gov.tw/dist/opendata-swagger.html). And use fetch to get the data from those apis.
+* When you try to modify an attribute or some attributes in state object, follow below... 
+
+{% hint style="danger" %}
+`setCurrentWeather({ temperature: 31, });`
+
+`console.log(currentWeather); // object left only temp attr`
+{% endhint %}
+
+{% hint style="success" %}
+`setCurrentWeather({ ...currentWeather, temperature: 31, })`
+
+`console.log(currentWeather); // reserve all attr of an object`
+{% endhint %}
 
