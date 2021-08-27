@@ -490,7 +490,7 @@ const acceptButton = styled.button`
 | beginning of the component | JSX | `useEffect()` |
 
 * Will be called either `setSomething()` is called or the first load. Or you can say that it will be called after **rendering**.
-* Mutations, subscriptions, timers, logging, and other **side effects** are not allowed inside the main body of a function component
+* Mutations, subscriptions, timers, logging, and other **side effects** are not allowed inside the main body of a function component.
 
 ```bash
  // [dependencies] is put to avoid infinite loop of calling
