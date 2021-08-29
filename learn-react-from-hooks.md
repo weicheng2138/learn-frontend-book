@@ -780,6 +780,13 @@ If the form won't access the component state, deal it with uncontrolled componen
 
 ```bash
 // Controlled Components in WeatherSetting Comp
+// Will Rerender everytime when changes happened in input
+const [locationName, setLocationName] = useState('臺北');
+
+const handleChange = (e) => {
+  setLocationName(e.target.value);
+};
+
 const handleSave = () => {
   if(locations.includes(locationName)) {
     setCurrentPage('WeatherCard');
@@ -795,8 +802,32 @@ const handleSave = () => {
         name="location"
         onChange={handleChange}
         value={locationName}
- />
- 
- 
+/>
+<Save onClick={handleSave}>儲存</Save>
+```
+
+```bash
+// Uncontrolled Components in WeatherSetting Comp
+// Will not Rerender everytime when changes happened in input
+const inputLocationRef = useRef(null);
+
+const handleSave = () => {
+  const locationName = inputLocationRef.current.value;
+  if(locations.includes(locationName)) {
+    setCurrentPage('WeatherCard');
+  } else {
+    alert(`儲存失敗：您輸入的 ${locationName} 並非有效的地區`);
+    return;
+  }
+};
+
+<StyledInputList 
+        list="location-list" 
+        id="location" 
+        name="location"
+        ref={inputLocationRef}
+        defaultValue='臺北'
+/>
+<Save onClick={handleSave}>儲存</Save>
 ```
 
