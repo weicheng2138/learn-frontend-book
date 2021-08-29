@@ -809,6 +809,8 @@ const handleSave = () => {
 ```bash
 // Uncontrolled Components in WeatherSetting Comp
 // Will not Rerender everytime when changes happened in input
+// Ref is way to get data from input. It does not mean that it is uncontrolled.
+
 const inputLocationRef = useRef(null);
 
 const handleSave = () => {
@@ -829,5 +831,20 @@ const handleSave = () => {
         defaultValue='臺北'
 />
 <Save onClick={handleSave}>儲存</Save>
+```
+
+* `<input value="123" ref={inputLocationRef} />` is **Controlled**
+* `<input  ref={inputLocationRef} />` is **Uncontrolled**
+
+### LocalStorage
+
+```bash
+// in WeatherApp Component
+const storageCity = localStorage.getItem('cityName');
+const [currentCity, setCurrentCity] = useState(storageCity || '臺北市');
+
+useEffect(() => {
+    localStorage.setItem('cityName', currentCity);
+}, [currentCity]);
 ```
 
