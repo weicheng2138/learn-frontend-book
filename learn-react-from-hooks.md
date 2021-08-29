@@ -1,3 +1,7 @@
+---
+description: 'Reference is https://ithelp.ithome.com.tw/articles/10216355'
+---
+
 # Learn React from Hooks
 
 ## Basics
@@ -365,7 +369,7 @@ const CardFooter = (props) => {
 **Never** use Hook method \(useState useEffect...\) in condition, loop and nested functions. But you can use the data and function from useState. Normally, the render process call those React Components, React Hooks record the calling order of those hooks. If you put it in condition, the order will be in echos.
 {% endhint %}
 
-## CSS-in-JS \(styled-components/_**emotion**_\)
+### CSS-in-JS \(styled-components/_**emotion**_\)
 
 {% hint style="info" %}
 [https://codesandbox.io/s/jovial-firefly-twwr8?file=/src/WeatherApp.js](https://codesandbox.io/s/jovial-firefly-twwr8?file=/src/WeatherApp.js)
@@ -439,6 +443,10 @@ const Location = styled.div`
 `;
 ```
 
+{% hint style="warning" %}
+You can not comment `${props => console.log(props)}` in Location component. It works for css element.
+{% endhint %}
+
 ```bash
 // pre-define some template style-component and reuse it
 // props also can be used
@@ -462,5 +470,364 @@ const acceptButton = styled.button`
   ${buttonDefault}
   background-color: green;
 `
+```
+
+* Get the weather data from [https://opendata.cwb.gov.tw/user/authkey](https://opendata.cwb.gov.tw/user/authkey) and api url from [https://opendata.cwb.gov.tw/dist/opendata-swagger.html](https://opendata.cwb.gov.tw/dist/opendata-swagger.html). And use fetch to get the data from those apis.
+* When you try to modify an attribute or some attributes in state object, follow below... 
+
+{% hint style="danger" %}
+`setCurrentWeather({ temperature: 31, });`
+
+`console.log(currentWeather); // object left only temp attr`
+{% endhint %}
+
+{% hint style="success" %}
+`setCurrentWeather({ ...currentWeather, temperature: 31, })`
+
+`console.log(currentWeather); // reserve all attr of an object`
+{% endhint %}
+
+### useEffect \(**side-effect**\)
+
+{% hint style="info" %}
+It \(any of it\) will be touched every rendering. By putting a specific state or props, you can only use it when the dependencies are mutated.
+{% endhint %}
+
+| invoke function component -&gt; | render -&gt; | execute function in useEffect |
+| :--- | :--- | :--- |
+| beginning of the component | JSX | `useEffect()` |
+
+* Will be called either `setSomething()` is called or the first load. Or you can say that it will be called after **rendering**.
+* Mutations, subscriptions, timers, logging, and other **side effects** are not allowed inside the main body of a function component.
+
+```bash
+ // [dependencies] is put to avoid infinite loop of calling
+ // setSomething and setEffect. Only call setEffect when
+ // dependencies is mutated. [] -> only the first time
+ useEffect(() => {
+    console.log('execute function in useEffect');
+    fetchCurrentWeather();
+ }, [dependencies]);
+```
+
+{% hint style="danger" %}
+After rendering, useEffect will be called as long as dependencies are mutated
+{% endhint %}
+
+```bash
+// setSomething can preserve the preState
+useEffect(() => {
+    console.log('execute function in useEffect');
+    fetchCurrentWeather();
+    fetchWeatherForecast();
+}, []);
+
+const fetchCurrentWeather = () =>
+    
+    setWeatherElement((preState) => ({
+        ...preState,
+        observationTime: locationData.time.obsTime,
+        ...
+    }));
+}
+
+const fetchWeatherForecast= () =>
+    
+    setWeatherElement((preState) => ({
+        ...preState,
+        description: weatherElements.Wx.parameterName,
+        ...
+    }));
+}
+
+// in JSX
+<Redo onClick={() => {
+    fetchCurrentWeather();
+    fetchWeatherForecast();
+}} />
+```
+
+```bash
+// make fetchData to be shared use in useEffect and JSX
+const fetchData = async () => {
+  const [currentWeather, weatherForecast] = await Promise.all([
+    fetchCurrentWeather(),
+    fetchWeatherForecast(),
+  ]);
+  
+  setWeatherElement({
+    ...currentWeather,
+    ...weatherForecast,
+  });
+};
+
+// in useEffect
+useEffect(() => {
+  console.log('execute function in useEffect');
+  fetchData();
+}, []);
+
+// in JSX
+<Redo onClick={fetchData} />
+```
+
+{% hint style="warning" %}
+After do things above... Eslint output error...
+
+_React Hook useEffect has a missing dependency: 'fetchData'. Either include it or remove the dependency array. \(react-hooks/exhaustive-deps\)_
+{% endhint %}
+
+* Before that eslint problem, fetchData is defined and only used in useEffect. However, we take it out and make it shared, problem pops out. 
+* To solve problem above, we put fetchData in position of dependencies of useEffect. Infinite issue pops up. Because when rendering happened, useEffect emits. fetchData was put in dependencies. Then rendering happened again. fetchData put in again, too. **After dependencies mutated, useEffect emits**. 
+
+  fetchData we put in is always a new fetchData. That's why **dependencies** always mutated every rendering.
+
+### useCallBack
+
+```bash
+// To solve the problem above
+// use useCallback to reserve the function 
+// when dependencies are not mutated
+import React, { useState, useEffect, useCallback } from 'react';
+
+const fetchData = useCallback(() => {
+  const fetchingData = async () => {
+  const [currentWeather, weatherForecast] = await Promise.all([
+     fetchCurrentWeather(),
+     fetchWeatherForecast(),
+   ]);
+    setWeatherElement({
+      ...currentWeather,
+      ...weatherForecast,
+    });
+  };
+  fetchingData();
+}, []);
+
+useEffect(() => {
+  console.log('execute function in useEffect');
+  fetchData();
+}, [fetchData]);
+```
+
+{% hint style="info" %}
+If the function won't be use in **shared** mode, we can directly define and call it in`useEffect`. If not, follow the practice above.
+{% endhint %}
+
+### useMemo
+
+```bash
+// use useMemo to reserve computed result
+// when dependencies are not mutated
+// weatherCode2Type is out of WeatherIcon Component
+const weatherCode2Type = (weatherCode) => {
+  const [weatherType] =
+    Object.entries(weatherTypes).find(([weatherType, weatherCodes]) =>
+      weatherCodes.includes(Number(weatherCode))
+    ) || [];
+  return weatherType;
+};
+
+// in WeatherIcon
+const theWeatherIcon = useMemo(
+  () => weatherCode2Type(currentWeatherCode), 
+  [currentWeatherCode]
+);
+
+useEffect(
+  () => {setCurrentWeatherIcon(theWeatherIcon)}, 
+  [theWeatherIcon]
+);
+
+return (
+  <IconContainer>{weatherIcons[moment][currentWeatherIcon]}</IconContainer>
+);
+```
+
+### ThemeProvider
+
+```bash
+import { css, ThemeProvider } from "@emotion/react";
+
+// in each styled-component
+const Container = styled.section`
+  background-color: ${({theme}) => theme.backgroundColor};
+  ...
+`;
+
+// in JSX
+<ThemeProvider theme={theme.dark}>
+    <Container />
+</ThemeProvider>
+```
+
+```bash
+// They are the same but be careful!!!
+() => {
+  return getMoment(weatherElement.locationName)
+}
+
+() => getMoment(weatherElement.locationName)
+```
+
+### Change Parent Component State from Child using hooks in React \(DIY\)
+
+```bash
+// in Parent Component
+const handleClick = (newValueFromWeatherCard) => {
+    setToggle(newValueFromWeatherCard);
+};
+
+return (
+    <WeatherCard
+        onClick={handleClick} // It's a props
+        toggle={toggle}
+    />
+)
+
+// in Child Component
+const WeatherCard = ({onClick, toggle}) => {
+    const handleClick = () => {
+        onClick(!toggle);
+    }
+    
+    return (
+        <ThemeButton onClick={handleClick} />
+    )
+}
+
+```
+
+### Custom Hook
+
+```bash
+// pull out the logic of api
+// in useWeatherApi hook
+import { useState, useEffect, useCallback } from 'react';
+
+const fetchCurrentWeather = ...
+const fetchWeatherForecast = ...
+
+const useWeatherApi = () => {
+    const [weatherElement, setWeatherElement] = useState({
+        data: ...,
+        data2: ...,
+        ...
+    })
+    
+    const fetchData = useCallBack(() => {
+        const fetchingData = ...
+        setWeatherElement() ...
+        fetchingData();
+    }, [])
+    
+    const useEffect(() => {
+        fetchData();
+    }, [fetchData])
+    
+    return [weatherElement, fetchData]
+}
+
+export default useWeatherApi;
+
+// in WeatherApp
+import useWeatherApi from './useWeatherApi';
+
+const WeatherApp = () => {
+    const [weatherElement, fetchData] = useWeatherApi();
+    const { locationName } = weatherElement;
+    
+    ...
+    return (
+        ...
+        <WeatherCard 
+            fetchData={fetchData}
+        />
+    )
+}
+```
+
+### Custom Location Setting Page \([compare with Change Parent Component State from Child](learn-react-from-hooks.md#change-parent-component-state-from-child-using-hooks-in-react-diy)\)
+
+* `label`in JSX, using `htmlFor`from having conflict with `for`
+* `datalist` is similar to `select`, but with input searching.
+
+```bash
+// in Parent Component
+return (
+    <WeatherCard
+        setToggle={setToggle} // It's a props
+        toggle={toggle}
+    />
+)
+
+// in Child Component
+const WeatherCard = ({setToggle, toggle}) => {
+
+    return (
+        <ThemeButton onClick={() => setToggle(!toggle)} />
+    )
+}
+```
+
+### Controlled vs Uncontrolled Components
+
+{% hint style="danger" %}
+`<input type="file" />` can be handled by only using uncontrolled components. Security issue for React. JS can get the value from user but not change the value. Also Uncontrolled Components won't pass data to React.
+
+If the form won't access the component state, deal it with uncontrolled components is a better solution from reducing some template code.
+{% endhint %}
+
+```bash
+// Controlled Components in WeatherSetting Comp
+// Will Rerender everytime when changes happened in input
+const [locationName, setLocationName] = useState('臺北');
+
+const handleChange = (e) => {
+  setLocationName(e.target.value);
+};
+
+const handleSave = () => {
+  if(locations.includes(locationName)) {
+    setCurrentPage('WeatherCard');
+  } else {
+    alert(`儲存失敗：您輸入的 ${locationName} 並非有效的地區`);
+    return;
+  }
+};
+
+<StyledInputList 
+        list="location-list" 
+        id="location" 
+        name="location"
+        onChange={handleChange}
+        value={locationName}
+/>
+<Save onClick={handleSave}>儲存</Save>
+```
+
+```bash
+// Uncontrolled Components in WeatherSetting Comp
+// Will not Rerender everytime when changes happened in input
+const inputLocationRef = useRef(null);
+
+const handleSave = () => {
+  const locationName = inputLocationRef.current.value;
+  if(locations.includes(locationName)) {
+    setCurrentPage('WeatherCard');
+  } else {
+    alert(`儲存失敗：您輸入的 ${locationName} 並非有效的地區`);
+    return;
+  }
+};
+
+<StyledInputList 
+        list="location-list" 
+        id="location" 
+        name="location"
+        ref={inputLocationRef}
+        defaultValue='臺北'
+/>
+<Save onClick={handleSave}>儲存</Save>
 ```
 
