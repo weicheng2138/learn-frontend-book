@@ -1,3 +1,7 @@
+---
+description: 'Reference is https://ithelp.ithome.com.tw/articles/10216355'
+---
+
 # Learn React from Hooks
 
 ## Basics
@@ -485,6 +489,10 @@ const acceptButton = styled.button`
 
 ### useEffect \(**side-effect**\)
 
+{% hint style="info" %}
+It \(any of it\) will be touched every rendering. By putting a specific state or props, you can only use it when the dependencies are mutated.
+{% endhint %}
+
 | invoke function component -&gt; | render -&gt; | execute function in useEffect |
 | :--- | :--- | :--- |
 | beginning of the component | JSX | `useEffect()` |
@@ -540,7 +548,7 @@ const fetchWeatherForecast= () =>
 ```
 
 ```bash
-// make fetchData to be public use in useEffect and JSX
+// make fetchData to be shared use in useEffect and JSX
 const fetchData = async () => {
   const [currentWeather, weatherForecast] = await Promise.all([
     fetchCurrentWeather(),
@@ -569,5 +577,226 @@ After do things above... Eslint output error...
 _React Hook useEffect has a missing dependency: 'fetchData'. Either include it or remove the dependency array. \(react-hooks/exhaustive-deps\)_
 {% endhint %}
 
-* Before that eslint problem, fetchData is defined and only used in useEffect. However, we take it out and make it public, problem pops out.
+* Before that eslint problem, fetchData is defined and only used in useEffect. However, we take it out and make it shared, problem pops out. 
+* To solve problem above, we put fetchData in position of dependencies of useEffect. Infinite issue pops up. Because when rendering happened, useEffect emits. fetchData was put in dependencies. Then rendering happened again. fetchData put in again, too. **After dependencies mutated, useEffect emits**. 
+
+  fetchData we put in is always a new fetchData. That's why **dependencies** always mutated every rendering.
+
+### useCallBack
+
+```bash
+// To solve the problem above
+// use useCallback to reserve the function 
+// when dependencies are not mutated
+import React, { useState, useEffect, useCallback } from 'react';
+
+const fetchData = useCallback(() => {
+  const fetchingData = async () => {
+  const [currentWeather, weatherForecast] = await Promise.all([
+     fetchCurrentWeather(),
+     fetchWeatherForecast(),
+   ]);
+    setWeatherElement({
+      ...currentWeather,
+      ...weatherForecast,
+    });
+  };
+  fetchingData();
+}, []);
+
+useEffect(() => {
+  console.log('execute function in useEffect');
+  fetchData();
+}, [fetchData]);
+```
+
+{% hint style="info" %}
+If the function won't be use in **shared** mode, we can directly define and call it in`useEffect`. If not, follow the practice above.
+{% endhint %}
+
+### useMemo
+
+```bash
+// use useMemo to reserve computed result
+// when dependencies are not mutated
+// weatherCode2Type is out of WeatherIcon Component
+const weatherCode2Type = (weatherCode) => {
+  const [weatherType] =
+    Object.entries(weatherTypes).find(([weatherType, weatherCodes]) =>
+      weatherCodes.includes(Number(weatherCode))
+    ) || [];
+  return weatherType;
+};
+
+// in WeatherIcon
+const theWeatherIcon = useMemo(
+  () => weatherCode2Type(currentWeatherCode), 
+  [currentWeatherCode]
+);
+
+useEffect(
+  () => {setCurrentWeatherIcon(theWeatherIcon)}, 
+  [theWeatherIcon]
+);
+
+return (
+  <IconContainer>{weatherIcons[moment][currentWeatherIcon]}</IconContainer>
+);
+```
+
+### ThemeProvider
+
+```bash
+import { css, ThemeProvider } from "@emotion/react";
+
+// in each styled-component
+const Container = styled.section`
+  background-color: ${({theme}) => theme.backgroundColor};
+  ...
+`;
+
+// in JSX
+<ThemeProvider theme={theme.dark}>
+    <Container />
+</ThemeProvider>
+```
+
+```bash
+// They are the same but be careful!!!
+() => {
+  return getMoment(weatherElement.locationName)
+}
+
+() => getMoment(weatherElement.locationName)
+```
+
+### Change Parent Component State from Child using hooks in React \(DIY\)
+
+```bash
+// in Parent Component
+const handleClick = (newValueFromWeatherCard) => {
+    setToggle(newValueFromWeatherCard);
+};
+
+return (
+    <WeatherCard
+        onClick={handleClick} // It's a props
+        toggle={toggle}
+    />
+)
+
+// in Child Component
+const WeatherCard = ({onClick, toggle}) => {
+    const handleClick = () => {
+        onClick(!toggle);
+    }
+    
+    return (
+        <ThemeButton onClick={handleClick} />
+    )
+}
+
+```
+
+### Custom Hook
+
+```bash
+// pull out the logic of api
+// in useWeatherApi hook
+import { useState, useEffect, useCallback } from 'react';
+
+const fetchCurrentWeather = ...
+const fetchWeatherForecast = ...
+
+const useWeatherApi = () => {
+    const [weatherElement, setWeatherElement] = useState({
+        data: ...,
+        data2: ...,
+        ...
+    })
+    
+    const fetchData = useCallBack(() => {
+        const fetchingData = ...
+        setWeatherElement() ...
+        fetchingData();
+    }, [])
+    
+    const useEffect(() => {
+        fetchData();
+    }, [fetchData])
+    
+    return [weatherElement, fetchData]
+}
+
+export default useWeatherApi;
+
+// in WeatherApp
+import useWeatherApi from './useWeatherApi';
+
+const WeatherApp = () => {
+    const [weatherElement, fetchData] = useWeatherApi();
+    const { locationName } = weatherElement;
+    
+    ...
+    return (
+        ...
+        <WeatherCard 
+            fetchData={fetchData}
+        />
+    )
+}
+```
+
+### Custom Location Setting Page \([compare with Change Parent Component State from Child](learn-react-from-hooks.md#change-parent-component-state-from-child-using-hooks-in-react-diy)\)
+
+* `label`in JSX, using `htmlFor`from having conflict with `for`
+* `datalist` is similar to `select`, but with input searching.
+
+```bash
+// in Parent Component
+return (
+    <WeatherCard
+        setToggle={setToggle} // It's a props
+        toggle={toggle}
+    />
+)
+
+// in Child Component
+const WeatherCard = ({setToggle, toggle}) => {
+
+    return (
+        <ThemeButton onClick={() => setToggle(!toggle)} />
+    )
+}
+```
+
+### Controlled vs Uncontrolled Components
+
+{% hint style="danger" %}
+`<input type="file" />` can be handled by only using uncontrolled components. Security issue for React. JS can get the value from user but not change the value. Also Uncontrolled Components won't pass data to React.
+
+If the form won't access the component state, deal it with uncontrolled components is a better solution from reducing some template code.
+{% endhint %}
+
+```bash
+// Controlled Components in WeatherSetting Comp
+const handleSave = () => {
+  if(locations.includes(locationName)) {
+    setCurrentPage('WeatherCard');
+  } else {
+    alert(`儲存失敗：您輸入的 ${locationName} 並非有效的地區`);
+    return;
+  }
+};
+
+<StyledInputList 
+        list="location-list" 
+        id="location" 
+        name="location"
+        onChange={handleChange}
+        value={locationName}
+ />
+ 
+ 
+```
 
