@@ -497,7 +497,7 @@ It \(any of it\) will be touched every rendering. By putting a specific state or
 | :--- | :--- | :--- |
 | beginning of the component | JSX | `useEffect()` |
 
-* Will be called either `setSomething()` is called or the first load. Or you can say that it will be called after **rendering**.
+* Will be called either `setSomething()`\(**state changed**\) is called or the first load \(**mounted**\). Or you can say that it will be called after **rendering**.
 * Mutations, subscriptions, timers, logging, and other **side effects** are not allowed inside the main body of a function component.
 
 ```bash
@@ -847,4 +847,13 @@ useEffect(() => {
     localStorage.setItem('cityName', currentCity);
 }, [currentCity]);
 ```
+
+## Progressive Web App \(PWA\)
+
+* serviceWorker.js in src and make `serviceWorker.register()` in index.js
+* icons for manifest.json in public folder
+* adjust content in manifest.json
+* adjust content in index.html
+
+
 
