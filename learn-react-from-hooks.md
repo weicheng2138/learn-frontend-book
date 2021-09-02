@@ -644,6 +644,9 @@ return (
 );
 ```
 
+1. Use it when you have a heavily computational function or a slow function for a variable. In case of that function keep rerun every single render. Because some of the rendering is not related to the slow function, you do not have to do it every time.
+2. It can make an reference of an object to be fixed or memorized. Eventually, every rendering in react component will make new reference for the object inside of it. Then when you use that object in the dependencies of an useEffect, it will still run every rendering. That object in the dependencies is different all the time even the value inside of it is the same.
+
 ### ThemeProvider
 
 ```bash
