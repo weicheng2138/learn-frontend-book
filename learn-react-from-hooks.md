@@ -1,5 +1,5 @@
 ---
-description: 'Reference is https://ithelp.ithome.com.tw/articles/10216355'
+description: Reference is https://ithelp.ithome.com.tw/articles/10216355
 ---
 
 # Learn React from Hooks
@@ -14,7 +14,7 @@ console.log(`The ${favoritePhone} is ${currentPrice} now.`);
 
 ### Arrow Functions
 
-```bash
+```javascript
 const showIphonePrice = (currentPrice) => {
   return `The iPhone is ${currentPrice} now.`;
 };
@@ -24,7 +24,7 @@ const showIphonePrice = (currentPrice) => {
 
 {% tabs %}
 {% tab title="Original" %}
-```bash
+```javascript
 const deviceName = 'Galaxy Note';
 const currentPrice = 30900;
 const storage = '256G';
@@ -140,7 +140,7 @@ Do the practice first to feel the reason why
 [https://codepen.io/weicheng2138/pen/LYLEoxp?editors=1011](https://codepen.io/weicheng2138/pen/LYLEoxp?editors=1011)
 {% endhint %}
 
-When we are manipulating the DOM in pure JS, we need to do the query select from the DOM and do what you want in JS. But JSX offers a way to deal with the DOM selecting in JS. **Babel**, **React** and **ReactDOM** are required.
+When we are manipulating the DOM in pure JS, we need to do the query select from the DOM and do what you want in JS. But JSX offers a way to deal with the DOM selecting in JS. **Babel**,** React **and** ReactDOM **are required.
 
 * `class` for DOM class List should be `className` in JSX.
 * inline-style in JSX should be `<div style={someStyle}`
@@ -178,7 +178,7 @@ ReactDOM.render(<Counter />,document.getElementById('root'));
 ```
 {% endtab %}
 
-{% tab title="React Component \(pure jsx\)" %}
+{% tab title="React Component (pure jsx)" %}
 ```
 // Simplified with () and no return
 const Counter = () => (
@@ -233,8 +233,8 @@ const { useState } = React;
 
 ### inline-style in JSX
 
-* `display: none` **occupation** will disappear and mess up
-* `visibility: hidden` occupation still alive
+* `display: none `**occupation** will disappear and mess up
+* `visibility: hidden `occupation still alive
 
 ```bash
 // two types of inline-style
@@ -274,7 +274,7 @@ className={`chevron chevron-up ${count >= 10 && 'visibility-hidden'}`}
 
 ### Handle Event
 
-* `onClick={function}`the function position should be a function not calling the function. We expect to call it when we click it, but it turn to be called while it's rendering. An infinite loop of **rendering -&gt; handleClick called -&gt; setCount called**.
+* `onClick={function}`the function position should be a function not calling the function. We expect to call it when we click it, but it turn to be called while it's rendering. An infinite loop of **rendering -> handleClick called -> setCount called**.
 
 {% hint style="danger" %}
 `onClick={handleClick('increment')}`
@@ -366,10 +366,10 @@ const CardFooter = (props) => {
 ```
 
 {% hint style="danger" %}
-**Never** use Hook method \(useState useEffect...\) in condition, loop and nested functions. But you can use the data and function from useState. Normally, the render process call those React Components, React Hooks record the calling order of those hooks. If you put it in condition, the order will be in echos.
+**Never** use Hook method (useState useEffect...) in condition, loop and nested functions. But you can use the data and function from useState. Normally, the render process call those React Components, React Hooks record the calling order of those hooks. If you put it in condition, the order will be in echos.
 {% endhint %}
 
-### CSS-in-JS \(styled-components/_**emotion**_\)
+### CSS-in-JS (styled-components/_**emotion**_)
 
 {% hint style="info" %}
 [https://codesandbox.io/s/jovial-firefly-twwr8?file=/src/WeatherApp.js](https://codesandbox.io/s/jovial-firefly-twwr8?file=/src/WeatherApp.js)
@@ -473,7 +473,7 @@ const acceptButton = styled.button`
 ```
 
 * Get the weather data from [https://opendata.cwb.gov.tw/user/authkey](https://opendata.cwb.gov.tw/user/authkey) and api url from [https://opendata.cwb.gov.tw/dist/opendata-swagger.html](https://opendata.cwb.gov.tw/dist/opendata-swagger.html). And use fetch to get the data from those apis.
-* When you try to modify an attribute or some attributes in state object, follow below... 
+* When you try to modify an attribute or some attributes in state object, follow below...&#x20;
 
 {% hint style="danger" %}
 `setCurrentWeather({ temperature: 31, });`
@@ -487,18 +487,18 @@ const acceptButton = styled.button`
 `console.log(currentWeather); // reserve all attr of an object`
 {% endhint %}
 
-### useEffect \(**side-effect**\)
+### useEffect (**side-effect**)
 
 {% hint style="info" %}
-It \(any of it\) will be touched every rendering. By putting a specific state or props, you can only use it when the dependencies are mutated.
+It (any of it) will be touched every rendering. By putting a specific state or props, you can only use it when the dependencies are mutated.
 {% endhint %}
 
-| invoke function component -&gt; | render -&gt; | execute function in useEffect |
-| :--- | :--- | :--- |
-| beginning of the component | JSX | `useEffect()` |
+| invoke function component -> | render -> | execute function in useEffect |
+| ---------------------------- | --------- | ----------------------------- |
+| beginning of the component   | JSX       | `useEffect()`                 |
 
-* Will be called either `setSomething()`\(**state changed**\) is called or the first load \(**mounted**\). Or you can say that it will be called after **rendering**.
-* Mutations, subscriptions, timers, logging, and other **side effects** are not allowed inside the main body of a function component.
+* Will be called either `setSomething()`(**state changed**) is called or the first load (**mounted**). Or you can say that it will be called after **rendering**.
+* Mutations, subscriptions, timers, logging, and other **side effects **are not allowed inside the main body of a function component.
 
 ```bash
  // [dependencies] is put to avoid infinite loop of calling
@@ -574,13 +574,13 @@ useEffect(() => {
 {% hint style="warning" %}
 After do things above... Eslint output error...
 
-_React Hook useEffect has a missing dependency: 'fetchData'. Either include it or remove the dependency array. \(react-hooks/exhaustive-deps\)_
+_React Hook useEffect has a missing dependency: 'fetchData'. Either include it or remove the dependency array. (react-hooks/exhaustive-deps)_
 {% endhint %}
 
-* Before that eslint problem, fetchData is defined and only used in useEffect. However, we take it out and make it shared, problem pops out. 
-* To solve problem above, we put fetchData in position of dependencies of useEffect. Infinite issue pops up. Because when rendering happened, useEffect emits. fetchData was put in dependencies. Then rendering happened again. fetchData put in again, too. **After dependencies mutated, useEffect emits**. 
+* Before that eslint problem, fetchData is defined and only used in useEffect. However, we take it out and make it shared, problem pops out.&#x20;
+*   To solve problem above, we put fetchData in position of dependencies of useEffect. Infinite issue pops up. Because when rendering happened, useEffect emits. fetchData was put in dependencies. Then rendering happened again. fetchData put in again, too. **After dependencies mutated, useEffect emits**.&#x20;
 
-  fetchData we put in is always a new fetchData. That's why **dependencies** always mutated every rendering.
+    fetchData we put in is always a new fetchData. That's why **dependencies **always mutated every rendering.
 
 ### useCallBack
 
@@ -673,7 +673,7 @@ const Container = styled.section`
 () => getMoment(weatherElement.locationName)
 ```
 
-### Change Parent Component State from Child using hooks in React \(DIY\)
+### Change Parent Component State from Child using hooks in React (DIY)
 
 ```bash
 // in Parent Component
@@ -750,7 +750,7 @@ const WeatherApp = () => {
 }
 ```
 
-### Custom Location Setting Page \([compare with Change Parent Component State from Child](learn-react-from-hooks.md#change-parent-component-state-from-child-using-hooks-in-react-diy)\)
+### Custom Location Setting Page ([compare with Change Parent Component State from Child](learn-react-from-hooks.md#change-parent-component-state-from-child-using-hooks-in-react-diy))
 
 * `label`in JSX, using `htmlFor`from having conflict with `for`
 * `datalist` is similar to `select`, but with input searching.
@@ -851,12 +851,10 @@ useEffect(() => {
 }, [currentCity]);
 ```
 
-## Progressive Web App \(PWA\)
+## Progressive Web App (PWA)
 
 * serviceWorker.js in src and make `serviceWorker.register()` in index.js
 * icons for manifest.json in public folder
 * adjust content in manifest.json
 * adjust content in index.html
-
-
 
