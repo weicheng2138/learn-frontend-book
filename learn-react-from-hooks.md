@@ -140,7 +140,7 @@ Do the practice first to feel the reason why
 [https://codepen.io/weicheng2138/pen/LYLEoxp?editors=1011](https://codepen.io/weicheng2138/pen/LYLEoxp?editors=1011)
 {% endhint %}
 
-When we are manipulating the DOM in pure JS, we need to do the query select from the DOM and do what you want in JS. But JSX offers a way to deal with the DOM selecting in JS. **Babel**,** React **and** ReactDOM **are required.
+When we are manipulating the DOM in pure JS, we need to do the query select from the DOM and do what you want in JS. But JSX offers a way to deal with the DOM selecting in JS. **Babel**, **React** and **ReactDOM** are required.
 
 * `class` for DOM class List should be `className` in JSX.
 * inline-style in JSX should be `<div style={someStyle}`
@@ -233,8 +233,8 @@ const { useState } = React;
 
 ### inline-style in JSX
 
-* `display: none `**occupation** will disappear and mess up
-* `visibility: hidden `occupation still alive
+* `display: none` **occupation** will disappear and mess up
+* `visibility: hidden` occupation still alive
 
 ```bash
 // two types of inline-style
@@ -498,7 +498,7 @@ It (any of it) will be touched every rendering. By putting a specific state or p
 | beginning of the component   | JSX       | `useEffect()`                 |
 
 * Will be called either `setSomething()`(**state changed**) is called or the first load (**mounted**). Or you can say that it will be called after **rendering**.
-* Mutations, subscriptions, timers, logging, and other **side effects **are not allowed inside the main body of a function component.
+* Mutations, subscriptions, timers, logging, and other **side effects** are not allowed inside the main body of a function component.
 
 ```bash
  // [dependencies] is put to avoid infinite loop of calling
@@ -580,7 +580,7 @@ _React Hook useEffect has a missing dependency: 'fetchData'. Either include it o
 * Before that eslint problem, fetchData is defined and only used in useEffect. However, we take it out and make it shared, problem pops out.&#x20;
 *   To solve problem above, we put fetchData in position of dependencies of useEffect. Infinite issue pops up. Because when rendering happened, useEffect emits. fetchData was put in dependencies. Then rendering happened again. fetchData put in again, too. **After dependencies mutated, useEffect emits**.&#x20;
 
-    fetchData we put in is always a new fetchData. That's why **dependencies **always mutated every rendering.
+    fetchData we put in is always a new fetchData. That's why **dependencies** always mutated every rendering.
 
 ### useCallBack
 
