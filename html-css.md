@@ -8,6 +8,24 @@ Becoming a super hero is a fairly straight forward process:
 
 * `em` > `i` **** (_example_)/ **** `strong` **** > **** `b` (**example**)&#x20;
 * `<img alt="" />`should put the content in alt for better to be search. Of course, the content should be highly related to the description of the image.
+*   You can use `srcset` to dynamicly change the size of picture along with window size. Or you can use `picture` tag
+
+    ```jsx
+    <img src="pic_1x.jpg" srcset="pic_1x.jpg 1x, pic_2x.jpg 2x" />
+    <img
+      src="pic_500x500.jpg"
+      srcset="pic_500x500.jpg 500w, pic_1000x1000.jpg 1000w"
+    />
+
+    <picture>
+        <source media="(min-width: 750px)"
+                srcset="images/horses-1600_large_2x.jpg 2x,
+                        images/horses-800_large_1x.jpg" />
+        <source media="(min-width: 500px)"
+                srcset="images/horses_medium.jpg" />
+        <img src="images/horses_small.jpg" alt="Horses in Hawaii">
+    </picture>
+    ```
 * `tbody` has the benefit to show the content when your view can see the content. Previous work may show all the contents at the beginning.
 
 {% hint style="warning" %}
