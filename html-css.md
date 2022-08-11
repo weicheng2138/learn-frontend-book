@@ -42,7 +42,7 @@ Log-in validation or financial related validation is better to construct in back
 * css reset will clean all style from all default tag. But css normalized only reset the some of it, depending on the file you import. `Link` tag in HTML should be in higher hierarchy  than your custom css file. [https://necolas.github.io/normalize.css/](https://necolas.github.io/normalize.css/)
 * `float: left` which needs to add with `clear: both` at the end of tag with class or its parent class. Although we can use Flexbox and Grid to solved, you may need to deal with some tech stack.
 * `list-style: none` and `text-decoration: none` to cancel the default style from some html tag.
-*   [https://caniuse.com/flexbox](https://caniuse.com/flexbox) & [https://flexboxfroggy.com/](https://flexboxfroggy.com)\
+*   [https://caniuse.com/flexbox](https://caniuse.com/flexbox) & [https://flexboxfroggy.com/](https://flexboxfroggy.com/)\
     `display: flex` go with`flex-direction` ,
 
     `flex-wrap` , `justify-contnet` and `align-items`and&#x20;
@@ -51,3 +51,9 @@ Log-in validation or financial related validation is better to construct in back
 
     `flex-grow`to fill the rest of extra space.`flex-shrink` to shrink target element for other brother elements. `order`d to make target element to be head, origin and tail.
 * When user click or tap the button or something, use rwd in tailwind with another css value for hover state (hover sticky)
+
+## 等比例縮放背景圖
+
+* `width: 100%`
+* `background-size: cover`
+* `padding-bottom: 44%`
