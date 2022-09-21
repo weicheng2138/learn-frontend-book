@@ -1,8 +1,4 @@
----
-description: ES6
----
-
-# Copy of Javascript
+# Javascript ES6
 
 ### Destructuring Assignment
 
