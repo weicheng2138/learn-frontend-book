@@ -90,6 +90,138 @@ for (let {name, type} of family) {
 }
 ```
 
+### Iterator
+
+ES6 Object who has iterator: `Array, Array-like, Object`,`Set` and `Map.`
+
+```javascript
+/**
+ * Create a custom iterable array
+ **/
+arr[Symbol.iterator] = () => {
+  let nextIndex = 0;
+  return {
+    next() {
+      return nextIndex < arr.length
+        ? {
+            value: arr[nextIndex++] * 2,
+            done: false,
+          }
+        : {
+            value: undefined,
+            done: true,
+          };
+    },
+  };
+};
+for (item of arr) {
+  // 當 done 為 true 時就不在疊代
+  console.log(item); // 2, 4, 6
+}
+
+/**
+ * You can also make object to be iterable
+ **/
+let person = {
+  firstName: 'Aaron',
+  lastName: 'Chen',
+  hobbies: ['computer', 'programming', 'sports'],
+  // 讓 JS 知道這個物件具有 iterator，所以是 iterable
+  [Symbol.iterator]: function () {
+    let index = 0;
+    let hobbies = this.hobbies;
+    return {
+      next() {
+        return index < hobbies.length
+          ? {
+              done: false,
+              value: hobbies[index++],
+            }
+          : {
+              done: true,
+              value: undefined,
+            };
+      },
+    };
+  },
+};
+
+for (let hobby of person) {
+  console.log(hobby); // computer, programming, spots
+}
+```
+
+### Generator
+
+It generates a serial and iterable of yield state
+
+```javascript
+function* gen() { 
+    yield 1;
+    yield 2;
+    yield 'active';
+}
+var g = gen();
+g.next() // {value: 1, done: false}
+g.next() // {value: 2, done: false}
+g.next() // {value: 'active', done: false}
+g.next() // {value: undefined, done: true}
+
+function* idMaker() {
+    var index = 0;
+
+    while(true) {
+        yield index++;
+    }
+}
+
+var gen = idMaker();
+// console.log will keep going when call it
+console.log( gen.next().value ); // 0
+console.log( gen.next().value ); // 1
+console.log( gen.next().value ); // 2
+
+/** */
+function* idMaker() {
+    var index = 0;
+
+    while(true) {
+        yield index++;
+        
+        if (index > 3) {
+            break;
+        }
+    }
+}
+
+for (let i of idMaker()) {
+    console.log(i);
+}// 依序輸出 0 1 2 3
+
+/** You can also pass in parameter into yield */
+function* gen() {
+    var index = 0;
+    
+    while(true) {
+        var value = yield index++;
+        
+        console.log('Value from outsise: ' + value);
+    }
+}
+var g = gen();
+console.log('Value from insise: ' + g.next(10).value);
+// 將 10 傳進 generator
+console.log('Value from insise: ' + g.next(20).value);
+// 將 20 傳進 generator
+console.log('Value from insise: ' + g.next(30).value);
+// 將 30 傳進 generator
+// Value from insise: 0
+// Value from outsise: 20
+// Value from insise: 1
+// Value from outsise: 30
+// Value from insise: 2
+```
+
 ### Spread Operator
 
 ```javascript
@@ -407,4 +539,15 @@ newPromise.then((data)=> {
   // 失敗訊息 (立即)
   console.log(err)
 });
+```
+
+### Other useful things
+
+```javascript
+// 二進制和八進製表示法
+console.log(0b1100011); // 99
+console.log(0o143); // 99
+
+// 指數運算
+console.log(2**6); // 64
 ```
