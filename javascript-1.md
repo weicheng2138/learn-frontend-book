@@ -2,7 +2,7 @@
 description: ES6
 ---
 
-# Javascript
+# Copy of Javascript
 
 ### Destructuring Assignment
 
