@@ -190,3 +190,221 @@ var fn = function(){
 button.addEventListener('click', fn_arrow);
 button.addEventListener('click', fn);
 ```
+
+### Syntactic sugar
+
+```javascript
+// 對物件直接寫入變數和函數，省略了許多關鍵詞
+let birth = '2018/01/01';
+let person = {
+    name: '老王',
+
+    // 等同於 birth: birth
+    birth,
+
+    // 等同於 sayHello: function() {...}
+    sayHello() { 
+        console.log('My name is '+ this.name + ' ' + this.birth);
+    }
+};
+```
+
+### Symbol
+
+This function always returns a **unique** symbol value. Even the value key is the same. Normally use it as constant value for the function.
+
+```javascript
+let s1 = Symbol('s1');
+let s2 = Symbol('s2');
+let s3 = Symbol('s2');
+
+console.log(s3 === s2) // false
+
+const obj = {
+    [s1]: 'Hello',
+    [s2]: 'World'
+};
+
+for (let key in obj) {
+    console.log(key); // 無輸出
+}
+
+let propertyNames = Object.getOwnPropertyNames(obj);
+console.log(propertyNames); // []
+
+
+let propertySymbols = Object.getOwnPropertySymbols(obj);
+console.log(propertySymbols); // [ Symbol(s1), Symbol(s2) ]
+```
+
+### Map (HashMap)
+
+Key of map can not be duplicated.
+
+{% hint style="warning" %}
+**Ordering** of array is better than map.
+{% endhint %}
+
+```javascript
+let myMap = new Map([
+  [1, 'one'],
+  [2, 'two'],
+]);
+
+myMap.set(keyFunc, 'value associated with function');
+
+// 方法
+myMap.has(keyString); // true，透過 .has 判斷該 Map 中是否有某一屬性
+myMap.size; //  3，透過 .size 來取得 Map 內的屬性數目
+myMap.get(keyString); // 使用 .get(key) 可取得屬性的內容
+myMap.delete(keyString); // 刪除 Map 中的某個屬性，成功刪除回傳 true，否則 false
+myMap.clear(); // 清空整個 Map
+
+
+/** Clone map */
+let students = {
+  Aaron: { age: '29', country: 'Taiwan' },
+  Jack: { age: '26', country: 'USA' },
+  Johnson: { age: '32', country: 'Korea' },
+};
+
+const studentMap = new Map(Object.entries(students));
+const cloneMap = new Map(studentMap);
+
+cloneMap.get('Aaron'); // { age: '29', country: 'Taiwan' }
+studentMap === cloneMap; // false. Useful for shallow comparison
+
+/** Making hashtable */
+const arr = ['apple', 'apple', 'banana', 'banana', 'cat', 'dog', 'fat', 'fat', 'fat', 'fat'];
+
+const hashTable = new Map();
+
+arr.forEach((item) => {
+  if (hashTable.has(item)) {
+    hashTable.set(item, hashTable.get(item) + 1);
+  } else {
+    hashTable.set(item, 1);
+  }
+});
+
+// Map { 'apple' => 2, 'banana' => 2, 'cat' => 1, 'dog' => 1, 'fat' => 4 }
+console.log(hashTable);
+```
+
+### Module System
+
+```javascript
+export const obj = {a: 1};
+export function foo() {
+    console.log('function test');
+}
+
+// 使用大括號 "{}" 做統一輸出
+let str = 'Hello';
+
+let foo = function() {
+    console.log('function test');
+}
+
+// 也能使用 as 重新命名
+export {str, foo as fooTest};
+import {str, fooTest} from './myModule.js';
+
+import * as module from './myModule.js';
+
+console.log(module.str); 
+console.log(module.obj);
+
+
+// Export default
+function circleArea(r) {
+    return console.log('area: ', r * r * 3.14);
+}
+export default circleArea;
+// --------------------------------------------
+// 檔名: import.js
+import getArea from './export.js';
+
+getArea(10); // area: 100
+```
+
+### Set
+
+```javascript
+let set = new Set();
+
+// 可以使用 add() 方法設置資料內容
+set.add(10);
+set.add(10);
+set.add('text');
+set.add({sayHi: 'Hi'});
+
+console.log(set);
+// Set(4) {10, "text", {sayHi: "Hi"}}
+```
+
+### Proxy
+
+{% hint style="info" %}
+**Vue3** is using `Proxy` object with getter and setter to fulfill reactive data. Vue3 didn't change the object value but proxy.\
+\
+Also using **Reflect** object to get and set proxy data.
+{% endhint %}
+
+{% hint style="info" %}
+**Vue2** fulfill the same thing by directly manipulating object data in terms of `Object.defineProperty` with getter and setter.
+{% endhint %}
+
+```javascript
+// 這是基本語法
+var proxy = new Proxy(target, handler);
+
+// 此用來攔截變數的 "物件內容"，改變它的原始行為 
+var proxy = new Proxy({}, {
+    get: function(target, propKey, receiver) {
+        return 'getting';
+    },
+    set: function(target, propKey, value, receiver) {
+        console.log('setting');
+    }
+});
+
+console.log(proxy.test);  // 'getting' 
+console.log(proxy.other); // 'getting' 
+
+// 以下都會執行 console.log('setting');
+proxy.abc = 10; 
+proxy[10] = 'test'; 
+
+// won't make set happen
+proxy.test.abc = 0
+```
+
+### Promise
+
+```javascript
+// 宣告 promise 建構式
+let newPromise = new Promise((resolve, reject) => {
+  // 傳入 resolve 與 reject，表示資料成功與失敗
+  let ran = parseInt(Math.random() * 2); // 隨機成功或失敗
+  console.log('Promise 開始')
+  if (ran) {
+    setTimeout(function(){
+      // 3 秒時間後，透過 resolve 來表示完成
+      resolve('3 秒時間(fulfilled)');
+    }, 3000);
+  } else {
+    // 回傳失敗
+    reject('失敗中的失敗(rejected)')
+  }
+
+});
+
+newPromise.then((data)=> {
+  // 成功訊息 (需要 3 秒)
+  console.log(data);
+}).catch((err)=> {
+  // 失敗訊息 (立即)
+  console.log(err)
+});
+```
