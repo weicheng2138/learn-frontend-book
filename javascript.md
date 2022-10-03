@@ -141,3 +141,108 @@ var functionExpression = function(){
 
 ## Closures
 
+```javascript
+/** numA is being conculde in closure in addB function
+ *  numA is temporarily kept in memory by addB function
+ */
+let country = 'United Nations'
+let soilder = ['Clone' , 'Clone' , 'Warship', 'Clone']; 
+let jedi = ['Yoda' , 'Obi-Wan', 'Anakin']
+
+function addA(numA){
+	return function (numB){
+		return numA+numB
+	} 
+} 
+let addB = addA(jedi.length)
+let fellowNum = addB(soilder.length) 
+
+/** When we push func into array variable i is kept by the pushFuncToArray to form
+ *  a closure and keep the value of i.
+ *  However, when we call the func in array, the value of i is 3. Because i do keep
+ *  in memory by closure but the have already increase to 3.
+ */
+function pushFuncToArray(){
+    var funcArr = [] 
+    for (var i=0; i<3; i++){
+        funcArr.push(function(){
+            console.log(i)
+        }) 
+    } 
+    return funcArr
+} 
+var functionArr = pushFuncToArray()
+functionArr[0]()
+functionArr[1]()
+functionArr[2]()
+```
+
+## Object Type and Primitive Type
+
+```javascript
+let hello = function(){
+	console.log('hello') 
+} 
+console.log(typeof hello) // function
+console.log( hello instanceof Object) // true
+```
+
+```javascript
+const a = {};
+const symbol1 = Symbol('123');
+const symbol2 = Symbol('123'); // they have different memory address in JS 
+console.log(typeof symbol1); // expected output: "symbol"
+
+a.symbol1 = 'Hello!';
+a[symbol1] // undefined
+a['symbol1'] // "Hello!"
+```
+
+## Event Queue, Event Loop and Event Table
+
+### JavaScript Engine
+
+V8 Engine consist of Global Ex. Context, Execution Stack and Global Memery (heap)
+
+### JS Runtime Environment ( JRE )
+
+Browser is not only consist of JS engine, it contains something like event listener, timer and other third party apis. Basicly JRE is construct by below.&#x20;
+
+#### Web Api
+
+Web api like `setTimeout` is not part of JS Engine, they are browser offered api.&#x20;
+
+* Api for DOM manipulation -> `document.getElementById`
+* Api which related to AJAX -> `XMLHttpRequest`
+* Api for timer -> `setTimeout, setInterval`
+
+#### Event Queue
+
+First in first out. After web api is finished its callback or waiting time, the function will be put into event queue and wait for to be put into stack.
+
+```javascript
+function executeAfterDelay() {
+  console.log("I will be printed after 1000 milliseconds")
+}
+
+setTimeout(executeAfterDelay, 1000)
+console.log("I will be executed first")
+for(let i=0; i<10000; i++){ // if for loop is more than 5s, executeAfterDelay need
+                            // to wait for it whenever the count down is finished 
+                            // or not.
+  console.log('@')
+}
+```
+
+1. `setTimeout` is called
+2. JS Engine keep executing the code below setTimeout. setTimeout is counting down.
+3. When count down is over, put the function (executeAfterDelay) into event queue.
+4. After JS Engine finish the console.log and for loop, event queue start to push tasks into stack and execute.
+
+#### Event Table
+
+A mapping table for web apis. Those apis will be put into this table before being put into event queue.
+
+#### Event Loop
+
+It's more like to be a watcher which is always watching at stack and event queue. And it also help the process to push event between stack and queue.
