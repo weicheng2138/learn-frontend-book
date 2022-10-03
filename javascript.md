@@ -210,7 +210,7 @@ Browser is not only consist of JS engine, it contains something like event liste
 
 #### Web Api
 
-Web api like `setTimeout` is not part of JS Engine, they are browser offered api.&#x20;
+Web api like `setTimeout` is not part of JS Engine, they are browser offered api. Background executed and asynchronous.
 
 * Api for DOM manipulation -> `document.getElementById`
 * Api which related to AJAX -> `XMLHttpRequest`
@@ -235,9 +235,9 @@ for(let i=0; i<10000; i++){ // if for loop is more than 5s, executeAfterDelay ne
 ```
 
 1. `setTimeout` is called
-2. JS Engine keep executing the code below setTimeout. setTimeout is counting down.
-3. When count down is over, put the function (executeAfterDelay) into event queue.
-4. After JS Engine finish the console.log and for loop, event queue start to push tasks into stack and execute.
+2. JS Engine keep executing the code below `setTimeout`. setTimeout is counting down.
+3. When count down is over, put the function (`executeAfterDelay`) into event queue.
+4. After JS Engine finish the `console.log` and for loop, event queue start to push tasks into stack and execute.
 
 #### Event Table
 
@@ -246,3 +246,7 @@ A mapping table for web apis. Those apis will be put into this table before bein
 #### Event Loop
 
 It's more like to be a watcher which is always watching at stack and event queue. And it also help the process to push event between stack and queue.
+
+## Promise
+
+A Promise is an object representing the eventual completion or failure of an asynchronous operation.
