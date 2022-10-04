@@ -250,3 +250,48 @@ It's more like to be a watcher which is always watching at stack and event queue
 ## Promise
 
 A Promise is an object representing the eventual completion or failure of an asynchronous operation.
+
+There are some properties in promise object:
+
+* State
+  * fulfilled (when you call `resolve()`)
+  * rejected(when you call `reject()`)
+  * pending
+* result
+
+{% code lineNumbers="true" %}
+```javascript
+const promise = new Promise((resolve, reject) => {
+  let random = Math.floor(Math.random()*10)
+  if(random%2 === 0) resolve(random)
+  if(random%2 !== 0) reject(random)
+})
+
+promise.then((data) => {
+  console.log(data)
+}).catch((error) => {
+  console.error(error)
+})
+
+const asyncFunc = async() => {
+  try {
+    let result = await promise
+    console.log(`result: ${result}`)
+  } catch(error) {
+    console.error(`result: ${error}`)
+  }
+}
+asyncFunc()
+```
+{% endcode %}
+
+## Macrotask & MicroTask
+
+### Macrotasks
+
+Normally to be Web Api and after execution will be put into **event queue** or called **macrotask queue**.
+
+### Microtasks
+
+Normally generate by **promise.** And it has its queue called microtask queue. However, the process of event loop iss the same.
+
