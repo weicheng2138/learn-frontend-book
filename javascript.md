@@ -287,6 +287,14 @@ asyncFunc()
 
 ## Macrotask & MicroTask
 
+[https://javascript.info/event-loop#summary](https://javascript.info/event-loop#summary)
+
+### Event Loop alg.
+
+1. While there are tasks:
+   * execute them, starting with the oldest task.
+2. Sleep until a task appears, then go to 1.
+
 ### Macrotasks
 
 Normally to be Web Api and after execution will be put into **event queue** or called **macrotask queue**.
@@ -294,4 +302,98 @@ Normally to be Web Api and after execution will be put into **event queue** or c
 ### Microtasks
 
 Normally generate by **promise.** And it has its queue called microtask queue. However, the process of event loop iss the same.
+
+{% hint style="info" %}
+Rendering never happens while the engine executes a task. It doesn’t matter if the task takes a long time. Changes to the DOM are painted only after the task is complete
+{% endhint %}
+
+{% hint style="warning" %}
+If a task takes too long, the browser can’t do other tasks, such as processing user events. So after a time, it raises an alert like “Page Unresponsive”, suggesting killing the task with the whole page. That happens when there are a lot of complex calculations or a programming error leading to an infinite loop.
+{% endhint %}
+
+```javascript
+/** Use-case 1: splitting CPU-hungry tasks */
+/** It will stuck */
+let i = 0;
+let start = Date.now();
+function count() {
+  // do a heavy job
+  for (let j = 0; j < 1e9; j++) {
+    i++;
+  }
+  alert("Done in " + (Date.now() - start) + 'ms');
+}
+count();
+
+/** It goes with 7491ms */
+let i = 0;
+let start = Date.now();
+function count() {
+  // do a piece of the heavy job (*)
+  do {
+    i++;
+  } while (i % 1e6 != 0);
+  if (i == 1e9) {
+    alert("Done in " + (Date.now() - start) + 'ms');
+  } else {
+    setTimeout(count); // schedule the new call (**)
+  }
+}
+count();
+
+/** It goes with 5054ms. Better than above */
+let i = 0;
+let start = Date.now();
+function count() {
+  // move the scheduling to the beginning
+  if (i < 1e9 - 1e6) {
+    setTimeout(count); // schedule the new call
+  }
+  do {
+    i++;
+  } while (i % 1e6 != 0);
+
+  if (i == 1e9) {
+    alert("Done in " + (Date.now() - start) + 'ms');
+  }
+}
+count();
+```
+
+{% hint style="info" %}
+As you remember, there’s the in-browser minimal delay of 4ms for many nested `setTimeout` calls. Even if we set `0`, it’s `4ms` (or a bit more). So the earlier we schedule it – the faster it runs.
+{% endhint %}
+
+```javascript
+/** Use case 2: progress indication */
+// the changes to i won’t show up until the function finishes, so we’ll see only the last value
+<div id="progress"></div>
+<script>
+  function count() {
+    for (let i = 0; i < 1e6; i++) {
+      i++;
+      progress.innerHTML = i;
+    }
+  }
+  count();
+</script>
+
+// the changes to i will show up
+<div id="progress"></div>
+<script>
+  let i = 0;
+  function count() {
+    // do a piece of the heavy job (*)
+    do {
+      i++;
+      progress.innerHTML = i;
+    } while (i % 1e3 != 0);
+
+    if (i < 1e7) {
+      setTimeout(count);
+    }
+  }
+  count();
+</script>
+```
 
