@@ -312,6 +312,19 @@ If a task takes too long, the browser can’t do other tasks, such as processing
 {% endhint %}
 
 ```javascript
+setTimeout(() => alert("timeout"));
+
+Promise.resolve()
+  .then(() => alert("promise"));
+
+alert("global ex. context");
+
+// global ex. context
+// promise
+// timeout
+```
+
+```javascript
 /** Use-case 1: splitting CPU-hungry tasks */
 /** It will stuck */
 let i = 0;
